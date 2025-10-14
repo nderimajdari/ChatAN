@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!-- Created By Nderim -->
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Chatbot AN</title>
+      <link rel="stylesheet" href="chat.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="shortcut icon" href="robot-solid.svg">
+   </head>
+   <body>
+
+      <input type="checkbox" id="click">
+         <label for="click">
+            <i class="fa fa-robot"></i>
+            <i class="fas fa-times"></i>
+         </label>
+      <div class="wrapper">
+         <div class="head-text">
+            Chatbot AN
+         </div>
+               <div class="chat-box">
+                  <div class="desc-text">
+                  </div>
+                     <div class="full-chat-block">
+                        <div class="outer-container">
+                              <div class="chat-container">
+                                    <div id="chatbox">
+                                       <h5 id="chat-timestamp" class="h5"></h5>
+                                       <p id="botStarterMessage" class="botText"><span>Loading...</span></p>
+                                    </div>
+                                          <div id="chat-bar-bottom">
+                                             <p></p>
+                                          </div>
+                              </div>
+                        </div>
+                     </div>
+               </div>
+                        <div class="chat-bar-input-block">
+                            <div id="userInput">
+                              <input id="textInput" class="input-box" type="text" name="msg" placeholder="Press enter to send">
+                                             <p></p>
+                            </div>
+                        </div>
+      </div>
+      
+   </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="responses.js"></script>
+<script src="chat.js"></script>
+</html>
