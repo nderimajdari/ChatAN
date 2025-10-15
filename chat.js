@@ -1,15 +1,3 @@
-const coll = document.getElementsByClassName("collapsible");
-
-const addCollapsibleEventListeners = () => {
-  for (const item of coll) {
-    item.addEventListener("click", () => {
-      item.classList.toggle("active");
-      const content = item.nextElementSibling;
-      content.style.maxHeight = content.style.maxHeight ? null : `${content.scrollHeight}px`;
-    });
-  }
-};
-
 const getTime = () => {
   const today = new Date();
   const time = today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -21,7 +9,7 @@ document.getElementById("botStarterMessage").innerHTML = `<p class="botText"><sp
 
 let time = getTime();
 $("#chat-timestamp").append(time);
-document.getElementById("userInput").scrollIntoView(false);
+document.getElementById("chatbox").scrollIntoView(false);
 
 let questionQueue = [];
 let isAnsweringQuestion = false;
@@ -113,7 +101,8 @@ const getHardResponse = (userText) => {
   displayTypingAnimation(botResponse);
 
   scrollIntervalId = setInterval(() => {
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
+    const chatBox = document.querySelector('.chat-box');
+    chatBox.scrollTop = chatBox.scrollHeight;
   }, 10);
 };
 
@@ -145,7 +134,8 @@ const getResponse = () => {
 
   $("#textInput").val("");
   $("#chatbox").append(userHtml);
-  document.getElementById("chat-bar-bottom").scrollIntoView(true);
+  const chatBox = document.querySelector('.chat-box');
+  chatBox.scrollTop = chatBox.scrollHeight;
 
   queueQuestion(userText);
 };
@@ -155,7 +145,8 @@ const buttonSendText = (sampleText) => {
 
   $("#textInput").val("");
   $("#chatbox").append(userHtml);
-  document.getElementById("chat-bar-bottom").scrollIntoView(true);
+  const chatBox = document.querySelector('.chat-box');
+  chatBox.scrollTop = chatBox.scrollHeight;
 };
 
 const sendButton = () => {
