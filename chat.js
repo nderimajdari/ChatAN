@@ -101,7 +101,7 @@ const getHardResponse = (userText) => {
   displayTypingAnimation(botResponse);
 
   scrollIntervalId = setInterval(() => {
-    const chatBox = document.querySelector('.chat-box');
+    const chatBox = document.querySelector('.chat-container');
     chatBox.scrollTop = chatBox.scrollHeight;
   }, 10);
 };
@@ -134,24 +134,14 @@ const getResponse = () => {
 
   $("#textInput").val("");
   $("#chatbox").append(userHtml);
-  const chatBox = document.querySelector('.chat-box');
+  const chatBox = document.querySelector('.chat-container');
   chatBox.scrollTop = chatBox.scrollHeight;
 
   queueQuestion(userText);
 };
 
-const buttonSendText = (sampleText) => {
-  let userHtml = `<p class="userText"><span>${sampleText}</span></p>`;
-
-  $("#textInput").val("");
-  $("#chatbox").append(userHtml);
-  const chatBox = document.querySelector('.chat-box');
-  chatBox.scrollTop = chatBox.scrollHeight;
-};
-
-const sendButton = () => {
-  getResponse();
-};
+const sendButton = document.querySelector("#send-btn");
+sendButton.addEventListener("click", getResponse);
 
 $("#textInput").keypress((e) => {
   if (e.which === 13) {
