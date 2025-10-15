@@ -144,7 +144,15 @@ const sendButton = document.querySelector("#send-btn");
 sendButton.addEventListener("click", getResponse);
 
 $("#textInput").keypress((e) => {
-  if (e.which === 13) {
+  if (e.which === 13 && !e.shiftKey) {
     getResponse();
+    e.preventDefault();
   }
+});
+
+// Auto resize textarea
+const textarea = document.querySelector('#textInput');
+textarea.addEventListener('input', () => {
+  textarea.style.height = 'auto';
+  textarea.style.height = `${textarea.scrollHeight}px`;
 });
