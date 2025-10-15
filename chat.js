@@ -1,26 +1,22 @@
-// chat.js - Frontend logic (integrates with existing responses.js)
-/* Assumptions:
-   - responses.js defines function getBotResponse(input)
-   - keep responses.js unchanged
-*/
+// chat.js - Chat AN frontend with human-like typing animation
+// Uses getBotResponse() from responses.js (left unchanged)
 
 document.addEventListener("DOMContentLoaded", () => {
   const chatbox = document.getElementById("chatbox");
   const textInput = document.getElementById("textInput");
   const sendButton = document.getElementById("sendButton");
 
-  // initial greeting (kept from original)
+  // Mesazhi fillestar
   const firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
-  // replace the initial loading text
   const starter = document.getElementById("botStarterMessage");
   if (starter) starter.textContent = firstMessage;
 
-  // helper to scroll to bottom
+  // ========== FUNKSIONE BAZË ==========
+
   function scrollToBottom() {
     chatbox.scrollTop = chatbox.scrollHeight;
   }
 
-  // create message nodes
   function appendUserMessage(text) {
     const wrapper = document.createElement("div");
     wrapper.className = "userText";
@@ -31,80 +27,88 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToBottom();
   }
 
-  function appendBotMessage(text) {
+  function appendBotMessageElement() {
     const wrapper = document.createElement("div");
     wrapper.className = "botText";
     const span = document.createElement("span");
-    span.innerHTML = text; // responses.js returns plain text (safe)
+    span.innerHTML = "";
     wrapper.appendChild(span);
     chatbox.appendChild(wrapper);
     scrollToBottom();
+    return span;
   }
 
-  // typing indicator
-  function showTypingIndicator() {
-    const wrap = document.createElement("div");
-    wrap.className = "botText typing-wrapper";
-    wrap.setAttribute("data-typing", "1");
-    const container = document.createElement("div");
-    container.className = "typing";
-    const d1 = document.createElement("div"); d1.className = "dot";
-    const d2 = document.createElement("div"); d2.className = "dot";
-    const d3 = document.createElement("div"); d3.className = "dot";
-    container.appendChild(d1); container.appendChild(d2); container.appendChild(d3);
-    wrap.appendChild(container);
-    chatbox.appendChild(wrap);
-    scrollToBottom();
-    return wrap;
-  }
+  // ========== EFEKTI I TYPING ME “GABIME” ==========
 
-  function removeTypingIndicator(indicatorNode) {
-    if (indicatorNode && indicatorNode.parentNode) {
-      indicatorNode.parentNode.removeChild(indicatorNode);
+  async function displayTypingAnimation(element, text) {
+    // Ky efekt shkruan ngadalë tekstin si njeri,
+    // ndonjëherë fshin një shkronjë dhe e shkruan prapë
+    const minDelay = 15;
+    const maxDelay = 55;
+    const errorChance = 0.07; // 7% mundësi për "gabim"
+
+    element.textContent = ""; // fillon bosh
+
+    for (let i = 0; i < text.length; i++) {
+      // mundësi e vogël për të bërë një "gabim" si njeri
+      if (Math.random() < errorChance && i > 0 && i < text.length - 2) {
+        element.textContent = element.textContent.slice(0, -1); // fshi 1 karakter
+        await sleep(randomDelay(minDelay, maxDelay));
+        element.textContent += text[i - 1]; // e shkruan prapë të saktën
+      }
+
+      element.textContent += text[i];
+      await sleep(randomDelay(minDelay, maxDelay));
+
+      scrollToBottom();
     }
   }
 
-  // process and reply (uses getBotResponse from responses.js)
-  function processMessage(userText) {
-    // show typing dots
-    const typingNode = showTypingIndicator();
-
-    // simulate "thinking" time: proportional to message length but bounded
-    const baseDelay = 300; // ms
-    const perChar = 25; // ms per char
-    const delay = Math.min(2000, baseDelay + userText.length * perChar);
-
-    setTimeout(() => {
-      // get bot response from responses.js
-      let botResponse = "Më vjen keq, nuk e kuptova."; // fallback
-      try {
-        botResponse = getBotResponse(userText);
-      } catch (e) {
-        console.error("Error calling getBotResponse:", e);
-      }
-      removeTypingIndicator(typingNode);
-      appendBotMessage(botResponse);
-    }, delay);
+  function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
   }
 
-  // send handler
+  function randomDelay(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // ========== LOGJIKA KRYESORE ==========
+
+  async function processMessage(userText) {
+    const botBubble = appendBotMessageElement();
+
+    // Merr përgjigjen nga responses.js
+    let botResponse = "Më vjen keq, nuk e kuptova.";
+    try {
+      botResponse = getBotResponse(userText);
+    } catch (e) {
+      console.error("Gabim gjatë marrjes së përgjigjes:", e);
+    }
+
+    // Simulo vonesën e leximit para se të shkruajë
+    await sleep(600 + Math.random() * 700);
+
+    // Shfaq efektin e typing
+    await displayTypingAnimation(botBubble, botResponse);
+  }
+
+  // ========== NDËRVEPRIMI I PËRDORUESIT ==========
+
   function sendMessage() {
     const text = textInput.value.trim();
     if (!text) return;
+
     appendUserMessage(text);
     textInput.value = "";
     processMessage(text);
   }
 
-  // events
   sendButton.addEventListener("click", sendMessage);
+
   textInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
-
-  // make initial scroll position appropriate
-  scrollToBottom();
 });
