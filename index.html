@@ -7,33 +7,30 @@
 
   <link rel="shortcut icon" href="robot-solid.svg" />
   <link rel="stylesheet" href="chat.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  
-  <!-- jQuery + responses.js + chat.js -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!-- responses.js pa ndryshime -->
   <script src="responses.js" defer></script>
   <script src="chat.js" defer></script>
 </head>
 <body>
   <div class="page-bg">
-    <div class="chat-wrapper" role="main" aria-label="Chatbot AN">
+    <div class="chat-wrapper">
       <header class="chat-header">
         <div class="title">
-          <img src="robot-solid.svg" alt="" class="logo">
+          <img src="robot-solid.svg" alt="logo" class="logo">
           <span>Chat AN</span>
         </div>
-        <div class="subtitle">Përgjigjet mbeten të paprekura</div>
       </header>
 
-      <section class="chat-body" id="chatbox" aria-live="polite">
-        <!-- Mesazhet shtohen këtu -->
+      <section id="chatbox" class="chat-body">
         <div class="botText initial"><span id="botStarterMessage">Loading...</span></div>
       </section>
 
       <div class="chat-footer">
         <form id="msgForm" autocomplete="off" onsubmit="return false;">
-          <input id="textInput" type="text" placeholder="Shkruajni mesazhin dhe shtyp Enter..." aria-label="Shkruaj mesazh">
-          <button id="sendButton" type="button" aria-label="Dërgo mesazhin"><i class="fa fa-paper-plane"></i></button>
+          <input id="textInput" type="text" placeholder="Shkruajni mesazhin..." aria-label="Shkruaj mesazh" />
+          <button id="sendButton" type="button"><i class="fa fa-paper-plane"></i></button>
         </form>
       </div>
     </div>
