@@ -1,169 +1,110 @@
-const coll = document.getElementsByClassName("collapsible");
+// chat.js - Frontend logic (integrates with existing responses.js)
+/* Assumptions:
+   - responses.js defines function getBotResponse(input)
+   - keep responses.js unchanged
+*/
 
-const addCollapsibleEventListeners = () => {
-  for (const item of coll) {
-    item.addEventListener("click", () => {
-      item.classList.toggle("active");
-      const content = item.nextElementSibling;
-      content.style.maxHeight = content.style.maxHeight ? null : `${content.scrollHeight}px`;
-    });
+document.addEventListener("DOMContentLoaded", () => {
+  const chatbox = document.getElementById("chatbox");
+  const textInput = document.getElementById("textInput");
+  const sendButton = document.getElementById("sendButton");
+
+  // initial greeting (kept from original)
+  const firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
+  // replace the initial loading text
+  const starter = document.getElementById("botStarterMessage");
+  if (starter) starter.textContent = firstMessage;
+
+  // helper to scroll to bottom
+  function scrollToBottom() {
+    chatbox.scrollTop = chatbox.scrollHeight;
   }
-};
 
-const getTime = () => {
-  const today = new Date();
-  const time = today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  return time;
-};
+  // create message nodes
+  function appendUserMessage(text) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "userText";
+    const span = document.createElement("span");
+    span.textContent = text;
+    wrapper.appendChild(span);
+    chatbox.appendChild(wrapper);
+    scrollToBottom();
+  }
 
-let firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
-document.getElementById("botStarterMessage").innerHTML = `<p class="botText"><span>${firstMessage}</span></p>`;
+  function appendBotMessage(text) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "botText";
+    const span = document.createElement("span");
+    span.innerHTML = text; // responses.js returns plain text (safe)
+    wrapper.appendChild(span);
+    chatbox.appendChild(wrapper);
+    scrollToBottom();
+  }
 
-let time = getTime();
-$("#chat-timestamp").append(time);
-document.getElementById("userInput").scrollIntoView(false);
+  // typing indicator
+  function showTypingIndicator() {
+    const wrap = document.createElement("div");
+    wrap.className = "botText typing-wrapper";
+    wrap.setAttribute("data-typing", "1");
+    const container = document.createElement("div");
+    container.className = "typing";
+    const d1 = document.createElement("div"); d1.className = "dot";
+    const d2 = document.createElement("div"); d2.className = "dot";
+    const d3 = document.createElement("div"); d3.className = "dot";
+    container.appendChild(d1); container.appendChild(d2); container.appendChild(d3);
+    wrap.appendChild(container);
+    chatbox.appendChild(wrap);
+    scrollToBottom();
+    return wrap;
+  }
 
-let questionQueue = [];
-let isAnsweringQuestion = false;
-let intervalId = null;
-let scrollIntervalId = null;
+  function removeTypingIndicator(indicatorNode) {
+    if (indicatorNode && indicatorNode.parentNode) {
+      indicatorNode.parentNode.removeChild(indicatorNode);
+    }
+  }
 
-const displayTypingAnimation = (botResponse, backspaceProb = 0.1) => {
-  let words = botResponse.split(" ");
-  let currentWord = 0;
-  let currentLetter = 0;
-  let wrongWord = false;
-  let wrongCount = 0;
+  // process and reply (uses getBotResponse from responses.js)
+  function processMessage(userText) {
+    // show typing dots
+    const typingNode = showTypingIndicator();
 
-  intervalId = setInterval(() => {
-    if (currentLetter <= words[currentWord].length) {
-      let sentence = words.slice(0, currentWord + 1).join(" ");
-      let cursor = currentLetter % 2 === 0 ? "_" : "";
-      if (wrongWord && currentLetter !== 0) {
-        $(".botText:last span").text(`${sentence}${cursor}`);
-      } else {
-        $(".botText:last span").text(`${sentence}${currentWord === words.length - 1 ? "" : " "}${cursor}`);
+    // simulate "thinking" time: proportional to message length but bounded
+    const baseDelay = 300; // ms
+    const perChar = 25; // ms per char
+    const delay = Math.min(2000, baseDelay + userText.length * perChar);
+
+    setTimeout(() => {
+      // get bot response from responses.js
+      let botResponse = "Më vjen keq, nuk e kuptova."; // fallback
+      try {
+        botResponse = getBotResponse(userText);
+      } catch (e) {
+        console.error("Error calling getBotResponse:", e);
       }
-      currentLetter++;
-    } else {
-      currentWord++;
-      currentLetter = 0;
-      wrongWord = false;
-      wrongCount = 0;
-    }
-
-    if (currentWord === words.length) {
-      clearInterval(intervalId);
-
-      setTimeout(() => {
-        $(".botText:last span:not(:last-child)").fadeOut("slow");
-      }, 2000);
-
-      displayBotResponse(botResponse);
-      clearQuestionQueue();
-      clearInterval(scrollIntervalId);
-    }
-
-    // Generate some wrong words
-    if (
-      currentLetter === Math.floor(words[currentWord].length / 2) &&
-      !wrongWord &&
-      wrongCount < 2 &&
-      Math.random() < backspaceProb
-    ) {
-      let wrongLength = Math.floor(Math.random() * (words[currentWord].length - currentLetter)) + 1;
-      let wrong = "";
-      for (let i = 0; i < wrongLength; i++) {
-        wrong += String.fromCharCode(Math.floor(Math.random() * 26) + 97); // Generate random lowercase letter
-      }
-      let correctedSentence = words.slice(0, currentWord).join(" ");
-      let wrongSentence = `${correctedSentence} ${wrong}`;
-      let cursor = currentLetter % 2 === 0 ? "_" : "";
-      $(".botText:last span").text(`${wrongSentence}${cursor}`);
-      wrongWord = true;
-      wrongCount++;
-      setTimeout(() => {
-        if (Math.random() < 0.5) {
-          $(".botText:last span").text(`${correctedSentence}${currentWord === words.length - 1 ? "" : " "}${cursor}`);
-          wrongWord = false;
-        } else {
-          $(".botText:last span").text(`${correctedSentence}${cursor}`);
-          currentLetter = correctedSentence.length;
-        }
-      }, 100);
-    }
-  }, 150);
-}
-
-const displayBotResponse = (botResponse) => {
-  let botHtml = `<p class="botText"><span>${botResponse}</span></p>`;
-  $(".botText:last").replaceWith(botHtml);
-};
-
-const clearQuestionQueue = () => {
-  isAnsweringQuestion = false;
-  processQuestionQueue();
-};
-
-const getHardResponse = (userText) => {
-  let botResponse = getBotResponse(userText);
-  let botHtml = `<p class="botText"><span>|</span></p>`;
-
-  $(".userText:last").after(botHtml);
-  displayTypingAnimation(botResponse);
-
-  scrollIntervalId = setInterval(() => {
-    document.getElementById("chat-bar-bottom").scrollIntoView(true);
-  }, 10);
-};
-
-const queueQuestion = async (userText) => {
-  questionQueue.push(userText);
-  await processQuestionQueue();
-};
-
-const processQuestionQueue = async () => {
-  if (questionQueue.length > 0 && !isAnsweringQuestion) {
-    isAnsweringQuestion = true;
-    const question = questionQueue.pop();
-    clearInterval(intervalId);
-    clearInterval(scrollIntervalId);
-    await getHardResponse(question);
-    await processQuestionQueue();
-    isAnsweringQuestion = false;
-  }
-};
-
-const getResponse = () => {
-  let userText = $("#textInput").val();
-
-  if (userText.trim() === "") {
-    return;
+      removeTypingIndicator(typingNode);
+      appendBotMessage(botResponse);
+    }, delay);
   }
 
-  let userHtml = `<p class="userText"><span>${userText}</span></p>`;
-
-  $("#textInput").val("");
-  $("#chatbox").append(userHtml);
-  document.getElementById("chat-bar-bottom").scrollIntoView(true);
-
-  queueQuestion(userText);
-};
-
-const buttonSendText = (sampleText) => {
-  let userHtml = `<p class="userText"><span>${sampleText}</span></p>`;
-
-  $("#textInput").val("");
-  $("#chatbox").append(userHtml);
-  document.getElementById("chat-bar-bottom").scrollIntoView(true);
-};
-
-const sendButton = () => {
-  getResponse();
-};
-
-$("#textInput").keypress((e) => {
-  if (e.which === 13) {
-    getResponse();
+  // send handler
+  function sendMessage() {
+    const text = textInput.value.trim();
+    if (!text) return;
+    appendUserMessage(text);
+    textInput.value = "";
+    processMessage(text);
   }
+
+  // events
+  sendButton.addEventListener("click", sendMessage);
+  textInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // make initial scroll position appropriate
+  scrollToBottom();
 });
