@@ -1,96 +1,169 @@
-// chat.js - Frontend with "displayTypingAnimation" and responses.js integration
+const coll = document.getElementsByClassName("collapsible");
 
-document.addEventListener("DOMContentLoaded", () => {
-  const chatbox = document.getElementById("chatbox");
-  const textInput = document.getElementById("textInput");
-  const sendButton = document.getElementById("sendButton");
+const addCollapsibleEventListeners = () => {
+  for (const item of coll) {
+    item.addEventListener("click", () => {
+      item.classList.toggle("active");
+      const content = item.nextElementSibling;
+      content.style.maxHeight = content.style.maxHeight ? null : `${content.scrollHeight}px`;
+    });
+  }
+};
 
-  // initial message
-  const firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
-  document.getElementById("botStarterMessage").textContent = firstMessage;
+const getTime = () => {
+  const today = new Date();
+  const time = today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  return time;
+};
 
-  // scroll to bottom
-  const scrollToBottom = () => (chatbox.scrollTop = chatbox.scrollHeight);
+let firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
+document.getElementById("botStarterMessage").innerHTML = `<p class="botText"><span>${firstMessage}</span></p>`;
 
-  const appendUserMessage = (text) => {
-    const div = document.createElement("div");
-    div.className = "userText";
-    div.innerHTML = `<span>${text}</span>`;
-    chatbox.appendChild(div);
-    scrollToBottom();
-  };
+let time = getTime();
+$("#chat-timestamp").append(time);
+document.getElementById("userInput").scrollIntoView(false);
 
-  const appendBotMessage = (text) => {
-    const div = document.createElement("div");
-    div.className = "botText";
-    const span = document.createElement("span");
-    div.appendChild(span);
-    chatbox.appendChild(div);
-    displayTypingAnimation(span, text);
-  };
+let questionQueue = [];
+let isAnsweringQuestion = false;
+let intervalId = null;
+let scrollIntervalId = null;
 
-  // Typing animation with human-like effect + small "mistakes/backspace"
-  function displayTypingAnimation(element, fullText) {
-    let i = 0;
-    let text = "";
-    const mistakeChance = 0.08; // 8% chance of a typo
-    const speed = 35 + Math.random() * 30;
+const displayTypingAnimation = (botResponse, backspaceProb = 0.1) => {
+  let words = botResponse.split(" ");
+  let currentWord = 0;
+  let currentLetter = 0;
+  let wrongWord = false;
+  let wrongCount = 0;
 
-    function typeChar() {
-      if (i < fullText.length) {
-        if (Math.random() < mistakeChance && /[a-z]/i.test(fullText[i])) {
-          const wrongChar = String.fromCharCode(
-            fullText.charCodeAt(i) + (Math.random() > 0.5 ? 1 : -1)
-          );
-          text += wrongChar;
-          element.textContent = text;
-          setTimeout(() => {
-            text = text.slice(0, -1); // backspace
-            element.textContent = text;
-            setTimeout(() => {
-              text += fullText[i];
-              element.textContent = text;
-              i++;
-              setTimeout(typeChar, speed);
-            }, 120 + Math.random() * 120);
-          }, 100 + Math.random() * 100);
-        } else {
-          text += fullText[i];
-          element.textContent = text;
-          i++;
-          setTimeout(typeChar, speed);
-        }
+  intervalId = setInterval(() => {
+    if (currentLetter <= words[currentWord].length) {
+      let sentence = words.slice(0, currentWord + 1).join(" ");
+      let cursor = currentLetter % 2 === 0 ? "_" : "";
+      if (wrongWord && currentLetter !== 0) {
+        $(".botText:last span").text(`${sentence}${cursor}`);
+      } else {
+        $(".botText:last span").text(`${sentence}${currentWord === words.length - 1 ? "" : " "}${cursor}`);
       }
+      currentLetter++;
+    } else {
+      currentWord++;
+      currentLetter = 0;
+      wrongWord = false;
+      wrongCount = 0;
     }
-    typeChar();
-    scrollToBottom();
+
+    if (currentWord === words.length) {
+      clearInterval(intervalId);
+
+      setTimeout(() => {
+        $(".botText:last span:not(:last-child)").fadeOut("slow");
+      }, 2000);
+
+      displayBotResponse(botResponse);
+      clearQuestionQueue();
+      clearInterval(scrollIntervalId);
+    }
+
+    // Generate some wrong words
+    if (
+      currentLetter === Math.floor(words[currentWord].length / 2) &&
+      !wrongWord &&
+      wrongCount < 2 &&
+      Math.random() < backspaceProb
+    ) {
+      let wrongLength = Math.floor(Math.random() * (words[currentWord].length - currentLetter)) + 1;
+      let wrong = "";
+      for (let i = 0; i < wrongLength; i++) {
+        wrong += String.fromCharCode(Math.floor(Math.random() * 26) + 97); // Generate random lowercase letter
+      }
+      let correctedSentence = words.slice(0, currentWord).join(" ");
+      let wrongSentence = `${correctedSentence} ${wrong}`;
+      let cursor = currentLetter % 2 === 0 ? "_" : "";
+      $(".botText:last span").text(`${wrongSentence}${cursor}`);
+      wrongWord = true;
+      wrongCount++;
+      setTimeout(() => {
+        if (Math.random() < 0.5) {
+          $(".botText:last span").text(`${correctedSentence}${currentWord === words.length - 1 ? "" : " "}${cursor}`);
+          wrongWord = false;
+        } else {
+          $(".botText:last span").text(`${correctedSentence}${cursor}`);
+          currentLetter = correctedSentence.length;
+        }
+      }, 100);
+    }
+  }, 150);
+}
+
+const displayBotResponse = (botResponse) => {
+  let botHtml = `<p class="botText"><span>${botResponse}</span></p>`;
+  $(".botText:last").replaceWith(botHtml);
+};
+
+const clearQuestionQueue = () => {
+  isAnsweringQuestion = false;
+  processQuestionQueue();
+};
+
+const getHardResponse = (userText) => {
+  let botResponse = getBotResponse(userText);
+  let botHtml = `<p class="botText"><span>|</span></p>`;
+
+  $(".userText:last").after(botHtml);
+  displayTypingAnimation(botResponse);
+
+  scrollIntervalId = setInterval(() => {
+    document.getElementById("chat-bar-bottom").scrollIntoView(true);
+  }, 10);
+};
+
+const queueQuestion = async (userText) => {
+  questionQueue.push(userText);
+  await processQuestionQueue();
+};
+
+const processQuestionQueue = async () => {
+  if (questionQueue.length > 0 && !isAnsweringQuestion) {
+    isAnsweringQuestion = true;
+    const question = questionQueue.pop();
+    clearInterval(intervalId);
+    clearInterval(scrollIntervalId);
+    await getHardResponse(question);
+    await processQuestionQueue();
+    isAnsweringQuestion = false;
+  }
+};
+
+const getResponse = () => {
+  let userText = $("#textInput").val();
+
+  if (userText.trim() === "") {
+    return;
   }
 
-  // Process input message
-  function sendMessage() {
-    const text = textInput.value.trim();
-    if (!text) return;
-    appendUserMessage(text);
-    textInput.value = "";
-    processMessage(text);
-  }
+  let userHtml = `<p class="userText"><span>${userText}</span></p>`;
 
-  function processMessage(userText) {
-    let botResponse = "Më vjen keq, nuk e kuptova.";
-    try {
-      botResponse = getBotResponse(userText); // nga responses.js
-    } catch (e) {
-      console.error("Gabim nga responses.js:", e);
-    }
-    // Shto pak vonesë për realizëm
-    setTimeout(() => appendBotMessage(botResponse), 700 + Math.random() * 600);
-  }
+  $("#textInput").val("");
+  $("#chatbox").append(userHtml);
+  document.getElementById("chat-bar-bottom").scrollIntoView(true);
 
-  sendButton.addEventListener("click", sendMessage);
-  textInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
+  queueQuestion(userText);
+};
+
+const buttonSendText = (sampleText) => {
+  let userHtml = `<p class="userText"><span>${sampleText}</span></p>`;
+
+  $("#textInput").val("");
+  $("#chatbox").append(userHtml);
+  document.getElementById("chat-bar-bottom").scrollIntoView(true);
+};
+
+const sendButton = () => {
+  getResponse();
+};
+
+$("#textInput").keypress((e) => {
+  if (e.which === 13) {
+    getResponse();
+  }
 });
