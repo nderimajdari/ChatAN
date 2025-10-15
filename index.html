@@ -1,31 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sq">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Chat AN</title>
-  <link rel="stylesheet" href="chat.css" />
+
   <link rel="shortcut icon" href="robot-solid.svg" />
+  <link rel="stylesheet" href="chat.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <!-- jQuery + responses.js + chat.js -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="responses.js" defer></script>
   <script src="chat.js" defer></script>
 </head>
 <body>
-  <div class="chat-wrapper">
-    <header class="chat-header">
-      <h2>Chat AN</h2>
-    </header>
+  <div class="page-bg">
+    <div class="chat-wrapper" role="main" aria-label="Chatbot AN">
+      <header class="chat-header">
+        <div class="title">
+          <img src="robot-solid.svg" alt="" class="logo">
+          <span>Chat AN</span>
+        </div>
+        <div class="subtitle">Përgjigjet mbeten të paprekura</div>
+      </header>
 
-    <main class="chat-main" id="chatbox">
-      <div class="botText">
-        <span id="botStarterMessage">Loading...</span>
+      <section class="chat-body" id="chatbox" aria-live="polite">
+        <!-- Mesazhet shtohen këtu -->
+        <div class="botText initial"><span id="botStarterMessage">Loading...</span></div>
+      </section>
+
+      <div class="chat-footer">
+        <form id="msgForm" autocomplete="off" onsubmit="return false;">
+          <input id="textInput" type="text" placeholder="Shkruajni mesazhin dhe shtyp Enter..." aria-label="Shkruaj mesazh">
+          <button id="sendButton" type="button" aria-label="Dërgo mesazhin"><i class="fa fa-paper-plane"></i></button>
+        </form>
       </div>
-    </main>
-
-    <footer class="chat-input-area">
-      <input id="textInput" type="text" placeholder="Type your message here..." autocomplete="off" />
-      <button id="sendButton"><i class="fa fa-paper-plane"></i></button>
-    </footer>
+    </div>
   </div>
 </body>
 </html>
