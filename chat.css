@@ -23,6 +23,8 @@
   --placeholder-color: #6c6c6c;
   --outgoing-chat-bg: #FFFFFF;
   --incoming-chat-bg: #F7F7F8;
+  --outgoing-chat-bg: #FFFFFF;
+  --incoming-chat-bg: #F7F7F8;
   --outgoing-chat-border: #FFFFFF;
   --incoming-chat-border: #D9D9E3;
 }
@@ -35,14 +37,14 @@ body {
   max-height: calc(100vh - 100px);
   padding-bottom: 150px;
 }
-:where(.chat-container, input)::-webkit-scrollbar {
+:where(.chat-container, textarea)::-webkit-scrollbar {
   width: 6px;
 }
-:where(.chat-container, input)::-webkit-scrollbar-track {
+:where(.chat-container, textarea)::-webkit-scrollbar-track {
   background: var(--incoming-chat-bg);
   border-radius: 25px;
 }
-:where(.chat-container, input)::-webkit-scrollbar-thumb {
+:where(.chat-container, textarea)::-webkit-scrollbar-thumb {
   background: var(--icon-color);
   border-radius: 25px;
 }
@@ -138,6 +140,7 @@ span.material-symbols-rounded {
   max-width: 950px;
   width: 100%;
   align-items: flex-end;
+  flex-direction: column;
 }
 .typing-container .typing-textarea {
   width: 100%;
@@ -182,6 +185,12 @@ span.material-symbols-rounded {
 }
 .typing-content span:hover {
   background: var(--icon-hover-bg);
+}
+.disclaimer {
+  font-size: 0.8rem;
+  color: var(--placeholder-color);
+  margin-top: 5px;
+  text-align: center;
 }
 
 /* User and Bot Text Styles from Original */
