@@ -1,39 +1,34 @@
 <!DOCTYPE html>
-<html lang="sq">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chat AN</title>
-
-  <link rel="shortcut icon" href="robot-solid.svg" />
-  <link rel="stylesheet" href="chat.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-  <!-- responses.js pa ndryshime -->
-  <script src="responses.js" defer></script>
-  <script src="chat.js" defer></script>
-</head>
-<body>
-  <div class="page-bg">
-    <div class="chat-wrapper">
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Chatbot AN</title>
+    <link rel="stylesheet" href="chat.css">
+    <link rel="shortcut icon" href="robot-solid.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="chat-container-full">
       <header class="chat-header">
-        <div class="title">
-          <img src="robot-solid.svg" alt="logo" class="logo">
-          <span>Chat AN</span>
-        </div>
+        <h1>Chatbot AN</h1>
       </header>
 
-      <section id="chatbox" class="chat-body">
-        <div class="botText initial"><span id="botStarterMessage">Loading...</span></div>
-      </section>
+      <main class="chat-main">
+        <div id="chatbox" class="chat-messages">
+          <h5 id="chat-timestamp" class="timestamp"></h5>
+          <p id="botStarterMessage" class="botText"><span>Loading...</span></p>
+        </div>
+      </main>
 
-      <div class="chat-footer">
-        <form id="msgForm" autocomplete="off" onsubmit="return false;">
-          <input id="textInput" type="text" placeholder="Shkruajni mesazhin..." aria-label="Shkruaj mesazh" />
-          <button id="sendButton" type="button"><i class="fa fa-paper-plane"></i></button>
-        </form>
-      </div>
+      <footer class="chat-footer">
+        <div id="userInput" class="input-area">
+          <input id="textInput" class="input-box" type="text" name="msg" placeholder="Type a message and press Enter..." autocomplete="off">
+        </div>
+      </footer>
     </div>
-  </div>
-</body>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="responses.js"></script>
+    <script src="chat.js"></script>
+  </body>
 </html>
