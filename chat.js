@@ -5,10 +5,8 @@ const getTime = () => {
 };
 
 let firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
-document.getElementById("botStarterMessage").innerHTML = `<p class="botText"><span>${firstMessage}</span></p>`;
+document.getElementById("botStarterMessage").innerHTML = `<p class="botText"><span>${firstMessage}</span></p><div class="bot-icons"><span class="material-symbols-rounded">thumb_up_off_alt</span><span class="material-symbols-rounded">thumb_down_off_alt</span><span class="material-symbols-rounded">content_copy</span><span class="material-symbols-rounded">autorenew</span><span class="material-symbols-rounded">more_horiz</span></div>`;
 
-let time = getTime();
-$("#chat-timestamp").append(time);
 document.getElementById("chatbox").scrollIntoView(false);
 
 let questionQueue = [];
@@ -84,7 +82,7 @@ const displayTypingAnimation = (botResponse, backspaceProb = 0.1) => {
 }
 
 const displayBotResponse = (botResponse) => {
-  let botHtml = `<p class="botText"><span>${botResponse}</span></p>`;
+  let botHtml = `<p class="botText"><span>${botResponse}</span></p><div class="bot-icons"><span class="material-symbols-rounded">thumb_up_off_alt</span><span class="material-symbols-rounded">thumb_down_off_alt</span><span class="material-symbols-rounded">content_copy</span><span class="material-symbols-rounded">autorenew</span><span class="material-symbols-rounded">more_horiz</span></div>`;
   $(".botText:last").replaceWith(botHtml);
 };
 
