@@ -4,7 +4,7 @@ const getTime = () => {
   return time;
 };
 
-let firstMessage = "Hello, I'm chatbot AN! How can I help you today?";
+let firstMessage = "Hello, I'm chat AN! How can I help you today?";
 document.getElementById("botStarterMessage").innerHTML = `<p class="botText"><span>${firstMessage}</span></p><div class="bot-icons"><span class="material-symbols-rounded">thumb_up_off_alt</span><span class="material-symbols-rounded">thumb_down_off_alt</span><span class="material-symbols-rounded">content_copy</span><span class="material-symbols-rounded">autorenew</span><span class="material-symbols-rounded">more_horiz</span></div>`;
 
 document.getElementById("chatbox").scrollIntoView(false);
@@ -154,3 +154,4 @@ textarea.addEventListener('input', () => {
   textarea.style.height = 'auto';
   textarea.style.height = `${textarea.scrollHeight}px`;
 });
+
