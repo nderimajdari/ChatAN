@@ -9,24 +9,33 @@
     <link rel="shortcut icon" href="robot-solid.svg">
   </head>
   <body>
-    <!-- Chats container -->
-    <div id="chatbox" class="chat-container">
-      <p id="botStarterMessage" class="botText"><span>Loading...</span></p>
-    </div>
-    <!-- Typing container -->
-    <div class="typing-container">
-      <div class="typing-content">
-        <div class="typing-textarea">
-          <textarea id="textInput" class="input-box" placeholder="+ Ask anything" required rows="1"></textarea>
-          <span id="mic-btn" class="material-symbols-rounded">mic</span>
-          <span id="send-btn" class="material-symbols-rounded">arrow_outward</span>
+    <div class="chat-wrapper">
+      <!-- Header -->
+      <header class="chat-header">
+        <img src="robot-solid.svg" alt="Chatbot Icon" class="bot-logo">
+        <h2>Chat AN</h2>
+      </header>
+
+      <!-- Chats container -->
+      <div id="chatbox" class="chat-container">
+        <p id="botStarterMessage" class="botText"><span>Loading...</span></p>
+      </div>
+
+      <!-- Typing container -->
+      <div class="typing-container">
+        <div class="typing-content">
+          <div class="typing-textarea">
+            <textarea id="textInput" class="input-box" placeholder="+ Ask anything" required rows="1"></textarea>
+            <span id="mic-btn" class="material-symbols-rounded">mic</span>
+            <span id="send-btn" class="material-symbols-rounded">arrow_outward</span>
+          </div>
+          <p class="disclaimer">Chat AN may make mistakes. Verify important information.</p>
         </div>
-        <p class="disclaimer">Chat AN can make mistakes. Check important info.</p>
       </div>
     </div>
-  </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="responses.js"></script>
-<script src="chat.js"></script>
-</html>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="responses.js"></script>
+    <script src="chat.js"></script>
+  </body>
+</html>
